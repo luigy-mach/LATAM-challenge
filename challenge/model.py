@@ -67,6 +67,30 @@ class FeatureGeneration:
         self.data['delay']       = self._delay(self.data)
         return self.data
         
+    def get_features_target(self)-> Tuple[pd.DataFrame, pd.Series]:
+        features = pd.concat([ 
+                                pd.get_dummies(self.data['OPERA'], prefix = 'OPERA'),
+                                pd.get_dummies(self.data['TIPOVUELO'], prefix = 'TIPOVUELO'), 
+                                pd.get_dummies(self.data['MES'], prefix = 'MES')], 
+                                axis = 1
+                            )
+        target = self.data['delay']
+        ### selection Feature Importance
+        top_10_features = [
+            "OPERA_Latin American Wings", 
+            "MES_7",
+            "MES_10",
+            "OPERA_Grupo LATAM",
+            "MES_12",
+            "TIPOVUELO_I",
+            "MES_4",
+            "MES_11",
+            "OPERA_Sky Airline",
+            "OPERA_Copa Air"
+        ]
+        features_importance = [top_10_features]
+        return features_importance, target
+        
 class DelayModel:
 
     def __init__(
