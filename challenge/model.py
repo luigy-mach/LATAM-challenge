@@ -1,3 +1,4 @@
+import numpy as np
 import pandas as pd
 
 from datetime import datetime
@@ -48,6 +49,23 @@ class FeatureGeneration:
             return 1
         else:
             return 0
+        
+    def _get_min_diff(self, data:pd.DataFrame) -> float:
+        fecha_o  = datetime.strptime(data['Fecha-O'], '%Y-%m-%d %H:%M:%S')
+        fecha_i  = datetime.strptime(data['Fecha-I'], '%Y-%m-%d %H:%M:%S')
+        min_diff = ((fecha_o - fecha_i).total_seconds())/60
+        return min_diff
+        
+    def _delay(self, data:pd.DataFrame)-> List[int]:
+        threshold_in_minutes = 15
+        return np.where(data['min_diff'] > threshold_in_minutes, 1, 0)
+        
+    def generate_all(self) -> pd.DataFrame:
+        self.data['period_day']  = self.data['Fecha-I'].apply(self._get_period_day)
+        self.data['high_season'] = self.data['Fecha-I'].apply(self._is_high_season)
+        self.data['min_diff']    = self.data.apply(self._get_min_diff, axis = 1)
+        self.data['delay']       = self._delay(self.data)
+        return self.data
         
 class DelayModel:
 
