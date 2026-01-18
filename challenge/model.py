@@ -2,6 +2,11 @@ import pandas as pd
 
 from typing import Tuple, Union, List
 
+class FeatureGeneration:
+    
+    def __init__(self, data: pd.DataFrame):
+        self.data = data.copy()
+
 class DelayModel:
 
     def __init__(
