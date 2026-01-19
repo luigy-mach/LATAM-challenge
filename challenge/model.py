@@ -104,7 +104,7 @@ class DelayModel:
         self,
         data: pd.DataFrame,
         target_column: str = None
-    ) -> Union(Tuple[pd.DataFrame, pd.DataFrame], pd.DataFrame):
+    ) -> Union[Tuple[pd.DataFrame, pd.DataFrame], pd.DataFrame]:
         """
         Prepare raw data for training or predict.
 
@@ -117,9 +117,14 @@ class DelayModel:
             or
             pd.DataFrame: features.
         """
-        feaGen = FeatureGeneration(data)
-        feature, target = feaGen.get_features_target()
-        return feature, target
+        feaGen  = FeatureGeneration(data)
+        feature = feaGen.get_features()
+        if target_column is not None:
+            feaGen.data['delay'] = feaGen._delay(feaGen.data)
+            target               = pd.DataFrame(feaGen.data['delay'], columns='delay')
+            return feature, target 
+        else:
+            return feature
 
     def fit(
         self,
@@ -133,15 +138,12 @@ class DelayModel:
             features (pd.DataFrame): preprocessed data.
             target (pd.DataFrame): target.
         """
-        # Data Split (Training and Validation) 
-        x_train, x_test, y_train, y_test = train_test_split(features, target, test_size = 0.33, random_state = 42)
-        
         # factor of balance
-        n_y0 = len(y_train[y_train == 0])
-        n_y1 = len(y_train[y_train == 1])
-        
-        self._model = LogisticRegression(class_weight={1: n_y0/len(y_train), 0: n_y1/len(y_train)})
-        self._model.fit(x_train, y_train)
+        n_y0 = len(target[target == 0])
+        n_y1 = len(target[target == 1])
+        # model training
+        self._model = LogisticRegression(class_weight={1: n_y1/len(target), 0: n_y0/len(target)})
+        self._model.fit(features, target)
         return
 
     def predict(
