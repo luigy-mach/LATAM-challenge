@@ -1,9 +1,14 @@
 import unittest
 import pandas as pd
+import json
 
+from pathlib import Path
 from sklearn.metrics import classification_report
 from sklearn.model_selection import train_test_split
 from challenge.model import DelayModel
+
+DATA_PATH = Path(__file__).resolve().parents[2]/"data"/"data.csv"
+
 
 class TestModel(unittest.TestCase):
 
@@ -28,8 +33,8 @@ class TestModel(unittest.TestCase):
     def setUp(self) -> None:
         super().setUp()
         self.model = DelayModel()
-        self.data = pd.read_csv(filepath_or_buffer="../data/data.csv")
-        
+        self.data = pd.read_csv(filepath_or_buffer=DATA_PATH)
+        # self.data = pd.read_csv(filepath_or_buffer="../data/data.csv")
 
     def test_model_preprocess_for_training(
         self
