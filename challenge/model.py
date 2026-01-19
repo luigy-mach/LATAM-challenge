@@ -115,7 +115,9 @@ class DelayModel:
             or
             pd.DataFrame: features.
         """
-        return
+        feaGen = FeatureGeneration(data)
+        feature, target = feaGen.get_features_target()
+        return feature, target
 
     def fit(
         self,
