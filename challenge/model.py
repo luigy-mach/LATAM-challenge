@@ -117,14 +117,14 @@ class DelayModel:
             or
             pd.DataFrame: features.
         """
-        feaGen  = FeatureGeneration(data)
-        feature = feaGen.get_features()
+        feaGen   = FeatureGeneration(data)
+        features = feaGen.get_features()
         if target_column is not None:
             feaGen.data['delay'] = feaGen._delay(feaGen.data)
-            target               = pd.DataFrame(feaGen.data['delay'], columns='delay')
-            return feature, target 
+            target               = pd.DataFrame(feaGen.data['delay'], columns=['delay'])
+            return features, target 
         else:
-            return feature
+            return features
 
     def fit(
         self,
