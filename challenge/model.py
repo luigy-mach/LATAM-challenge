@@ -6,6 +6,7 @@ from typing import Tuple, Union, List
 
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
+from sklearn.exceptions import NotFittedError
 
 class FeatureGeneration:
     
@@ -98,7 +99,7 @@ class DelayModel:
     def __init__(
         self
     ):
-        self._model = None # Model should be saved in this attribute.
+        self._model = LogisticRegression()
 
     def preprocess(
         self,
@@ -159,4 +160,15 @@ class DelayModel:
         Returns:
             (List[int]): predicted targets.
         """
-        return self._model.predict(features)
+        try:
+            preds = self._model.predict(features)
+        except NotFittedError:
+            from pathlib import Path
+            # fit with base dataset 
+            DATA_PATH = Path(__file__).resolve().parents[1]/"data"/"data.csv"
+            data = pd.read_csv(filepath_or_buffer=DATA_PATH)
+
+
+            X_train, y_train = self.preprocess(data=data, target_column="delay")
+            self.fit(features=X_train, target=y_train)
+        return self._model.predict(features).astype(int).tolist()
