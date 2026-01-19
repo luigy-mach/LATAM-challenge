@@ -67,17 +67,16 @@ class FeatureGeneration:
         self.data['period_day']  = self.data['Fecha-I'].apply(self._get_period_day)
         self.data['high_season'] = self.data['Fecha-I'].apply(self._is_high_season)
         self.data['min_diff']    = self.data.apply(self._get_min_diff, axis = 1)
-        self.data['delay']       = self._delay(self.data)
         return self.data
         
-    def get_features_target(self)-> Tuple[pd.DataFrame, pd.Series]:
+    def get_features(self)-> pd.DataFrame:
+        self.data = self.generate_all()
         features = pd.concat([ 
                                 pd.get_dummies(self.data['OPERA'], prefix = 'OPERA'),
                                 pd.get_dummies(self.data['TIPOVUELO'], prefix = 'TIPOVUELO'), 
                                 pd.get_dummies(self.data['MES'], prefix = 'MES')], 
                                 axis = 1
                             )
-        target = self.data['delay']
         ### selection Feature Importance
         top_10_features = [
             "OPERA_Latin American Wings", 
@@ -91,8 +90,8 @@ class FeatureGeneration:
             "OPERA_Sky Airline",
             "OPERA_Copa Air"
         ]
-        features_importance = [top_10_features]
-        return features_importance, target
+        features_importance = features[top_10_features]
+        return features_importance
         
 class DelayModel:
 
