@@ -158,4 +158,4 @@ class DelayModel:
         Returns:
             (List[int]): predicted targets.
         """
-        return
+        return self._model.predict(features)
