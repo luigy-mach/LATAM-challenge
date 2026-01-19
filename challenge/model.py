@@ -4,6 +4,9 @@ import pandas as pd
 from datetime import datetime
 from typing import Tuple, Union, List
 
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LogisticRegression
+
 class FeatureGeneration:
     
     def __init__(self, data: pd.DataFrame):
@@ -131,6 +134,15 @@ class DelayModel:
             features (pd.DataFrame): preprocessed data.
             target (pd.DataFrame): target.
         """
+        # Data Split (Training and Validation) 
+        x_train, x_test, y_train, y_test = train_test_split(features, target, test_size = 0.33, random_state = 42)
+        
+        # factor of balance
+        n_y0 = len(y_train[y_train == 0])
+        n_y1 = len(y_train[y_train == 1])
+        
+        self._model = LogisticRegression(class_weight={1: n_y0/len(y_train), 0: n_y1/len(y_train)})
+        self._model.fit(x_train, y_train)
         return
 
     def predict(
