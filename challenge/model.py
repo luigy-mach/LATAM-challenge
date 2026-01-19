@@ -139,11 +139,11 @@ class DelayModel:
             target (pd.DataFrame): target.
         """
         # factor of balance
-        n_y0 = len(target[target == 0])
-        n_y1 = len(target[target == 1])
+        n_y0 = len(target['delay'][target['delay'] == 0])
+        n_y1 = len(target['delay'][target['delay'] == 1])
         # model training
-        self._model = LogisticRegression(class_weight={1: n_y1/len(target), 0: n_y0/len(target)})
-        self._model.fit(features, target)
+        self._model = LogisticRegression(class_weight={1: n_y0/len(target['delay']), 0: n_y1/len(target['delay'])})
+        self._model.fit(features, target['delay'])
         return
 
     def predict(
