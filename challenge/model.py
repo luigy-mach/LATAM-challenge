@@ -11,7 +11,9 @@ from sklearn.exceptions import NotFittedError
 class FeatureGeneration:
     
     def __init__(self, data: pd.DataFrame):
-        self.data = data.copy()
+        self.data             = data.copy()
+        self._airlines        = None
+        self._top_10_features = None
         
     def _get_period_day(self, date:str) -> str: 
         date_time     = datetime.strptime(date, '%Y-%m-%d %H:%M:%S').time()
@@ -78,8 +80,9 @@ class FeatureGeneration:
                                 pd.get_dummies(self.data['MES'], prefix = 'MES')], 
                                 axis = 1
                             )
+        self._airlines = self.data['OPERA'].unique()
         ### selection Feature Importance
-        top_10_features = [
+        self._top_10_features = [
             "OPERA_Latin American Wings", 
             "MES_7",
             "MES_10",
@@ -91,7 +94,7 @@ class FeatureGeneration:
             "OPERA_Sky Airline",
             "OPERA_Copa Air"
         ]
-        features_importance = features[top_10_features]
+        features_importance = features[self._top_10_features]
         return features_importance
         
 class DelayModel:
@@ -99,8 +102,9 @@ class DelayModel:
     def __init__(
         self
     ):
-        self._model = LogisticRegression()
-
+        self._model          = LogisticRegression()
+        self.top_10_features = None
+        self.airlines        = None
     def preprocess(
         self,
         data: pd.DataFrame,
@@ -120,6 +124,9 @@ class DelayModel:
         """
         feaGen   = FeatureGeneration(data)
         features = feaGen.get_features()
+        self.airlines        = feaGen._airlines
+        self.top_10_features = feaGen._top_10_features
+        
         if target_column is not None:
             feaGen.data['delay'] = feaGen._delay(feaGen.data)
             target               = pd.DataFrame(feaGen.data['delay'], columns=['delay'])
