@@ -28,6 +28,17 @@ model.fit(
     target   = y_train
 )
 
+"""
+    Define the schemas feature and boy
+"""
+class Feature(BaseModel):
+    OPERA     : str
+    TIPOVUELO : Optional[str]
+    MES       : Optional[int]
+
+class Body(BaseModel):
+    flights : List[Feature]
+
 
 @app.get("/health", status_code=200)
 async def get_health() -> dict:
