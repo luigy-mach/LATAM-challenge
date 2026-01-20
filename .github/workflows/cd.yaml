@@ -1,0 +1,44 @@
+name: CD
+
+on:
+  push:
+    branches: ["main"]
+
+# on:
+#     push:
+#         branches: ["develop"]
+
+permissions:
+  contents: read
+  id-token: write  # OIDC recomendado
+
+jobs:
+  build_push_deploy:
+    runs-on: ubuntu-latest
+    environment: production  # útil para approvals en GitHub Environments
+    env:
+      AWS_REGION: ${{ vars.AWS_REGION }}
+      CONTAINER_NAME: app
+
+    steps:
+      - uses: actions/checkout@v4
+
+      # 1) Auth AWS (OIDC)
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+            aws-region: ${{ vars.AWS_REGION }}
+
+      # 2) Login ECR
+      - name: Login to Amazon ECR
+        id: ecr
+        uses: aws-actions/amazon-ecr-login@v2
+        
+
+      # 3) Build & Push image
+      - name: Build and push
+        id: build
+        run: |            
+            docker build -t challenge .
+            docker tag challenge:latest ${{secrets.AWS_ACCOUNT_ID}}.dkr.ecr.${{vars.AWS_REGION}}.amazonaws.com/challenge:latest
+            docker push ${{secrets.AWS_ACCOUNT_ID}}.dkr.ecr.${{vars.AWS_REGION}}.amazonaws.com/challenge:latest
