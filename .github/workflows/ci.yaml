@@ -1,0 +1,42 @@
+name: CI
+
+on:
+  pull_request:
+    branches: ["main"]
+
+# on:
+#     push:
+#         branches: ["develop"]
+
+permissions:
+    contents: read
+
+jobs:
+    test:
+        runs-on: ubuntu-latest
+        steps:
+        - uses: actions/checkout@v4
+
+        - uses: actions/setup-python@v5
+          with:
+            python-version: "3.12.3"
+            cache: "pip"
+
+        - name: Install
+          run: |
+            python -m pip install --upgrade pip
+            python -m pip install -r requirements.txt -r requirements-dev.txt -r requirements-test.txt
+
+        - name: Tests
+          env:
+            MODE: "github actions"
+          run: |
+            make model-test
+            make api-test
+
+    docker_build_check:
+        runs-on: ubuntu-latest
+        steps:
+        - uses: actions/checkout@v4
+        - name: Build image (no push)
+          run: docker build -t latam-challenge:ci .
