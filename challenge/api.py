@@ -40,6 +40,17 @@ class Body(BaseModel):
     flights : List[Feature]
 
 
+"""
+    Define the endpoints
+"""
+@app.get("/")
+def root():
+    return {"message": "API running. Try /docs or /health"}
+
+@app.get("/favicon.ico", include_in_schema=False)
+def favicon():
+    return Response(status_code=204)
+
 @app.get("/health", status_code=200)
 async def get_health() -> dict:
     return {
