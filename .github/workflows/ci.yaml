@@ -27,12 +27,12 @@ jobs:
             python -m pip install --upgrade pip
             python -m pip install -r requirements.txt -r requirements-dev.txt -r requirements-test.txt
 
-        #   - name: Tests
-        #     env:
-        #       MODE: "github actions"
-        #     run: |
-        #       make model-test
-        #       make api-test
+        - name: Tests
+          env:
+            MODE: "github actions"
+          run: |
+            make model-test
+            make api-test
 
     docker_build_check:
         runs-on: ubuntu-latest
