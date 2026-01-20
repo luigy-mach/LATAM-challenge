@@ -34,3 +34,17 @@
 ### CI/CD
 - Se implementó el pipeline de **CI/CD parcialmente**.
 - No se pudo **validar al 100%** en **GitHub Actions** por limitaciones de **billing**.
+
+
+
+### Pasos para ejecutar Docker localmente
+Ejecuta en la consola:
+
+```bash
+docker build -t latam-challenge-api .
+docker run --rm -p 8080:8080 latam-challenge-api
+```
+
+Luego abre en tu navegador:
+
+http://localhost:8080
