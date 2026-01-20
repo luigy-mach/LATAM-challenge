@@ -58,5 +58,44 @@ async def get_health() -> dict:
     }
 
 @app.post("/predict", status_code=200)
-async def post_predict() -> dict:
-    return
+async def post_predict(body: Body) -> dict:
+    try:
+        data_entry = pd.DataFrame(0, index=np.arange(len(body.flights)), columns=model.top_10_features)
+        for i, flight in enumerate(body.flights):
+            # OPERA
+            if flight.OPERA not in model.airlines:
+                raise HTTPException(
+                    status_code=400,
+                    detail=f"La propiedad OPERA en el indice {i} debe ser una de las aerolineas usadas en el modelo",
+                )
+            else:
+                if flight.OPERA in model.top_10_features:
+                    data_entry.loc[i,'OPERA_' + flight.OPERA] = 1
+            # TIPOVUELO
+            if flight.TIPOVUELO is not None:
+                if flight.TIPOVUELO not in ["N", "I"]:
+                    raise HTTPException(
+                        status_code=400,
+                        detail="La propiedad TIPOVUELO debe ser 'N' o 'I'",
+                    )
+                data_entry.loc[i,'TIPOVUELO_I'] = int(flight.TIPOVUELO == 'I')
+            # MES
+            if flight.MES in range(1, 13):
+                month = 'MES_' + str(flight.MES)
+                if month in model.top_10_features:
+                    data_entry.loc[i,month] = 1
+            else:
+                raise HTTPException(
+                    status_code=400,
+                    detail="La propiedad MES debe estar entre 1 y 12",
+                )
+        pred = model.predict(data_entry)
+        # JSON serializable 
+        pred_list = [int(x) for x in pred]
+        response = {"predict": pred_list}
+        return response
+    except HTTPException:
+        raise
+    except Exception as exception:
+        # Errores inesperados 500
+        raise HTTPException(status_code=500, detail=str(exception))
