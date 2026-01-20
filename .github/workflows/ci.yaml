@@ -39,4 +39,4 @@ jobs:
         steps:
         - uses: actions/checkout@v4
         - name: Build image (no push)
-            run: docker build -t latam-challenge:ci .
+          run: docker build -t latam-challenge:ci .
