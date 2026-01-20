@@ -7,7 +7,7 @@ from typing import List, Optional
 from pydantic import BaseModel
 from .model import DelayModel
 from sklearn.model_selection import train_test_split
-from fastapi import HTTPException
+from fastapi import HTTPException, Response
 
 """
     preprocess data and fit model to serving
